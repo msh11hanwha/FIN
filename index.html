@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!-- 한국어 문서 선언 -->
+<html lang="ko">
+<head>
+  <!-- 문자 인코딩 설정 (UTF-8) -->
+  <meta charset="UTF-8">
+  <!-- 모바일 환경을 위한 반응형 뷰포트 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 웹페이지 제목 -->
+  <title>실시간 공기 신호등 | 에어코리아 대기오염 정보</title>
+  <!-- Pretendard 웹폰트 CDN 연결 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <!-- 외부 스타일시트 연결 -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js 최신 CDN 라이브러리 연결 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- 전체 화면을 감싸는 컨테이너 -->
+  <div class="container">
+    <!-- 헤더 영역 -->
+    <header class="header">
+      <!-- 서비스 메인 타이틀 -->
+      <h1>실시간 공기 신호등</h1>
+      <!-- 부제목 설명 -->
+      <p class="subtitle">우리 동네 대기 상태를 신호등으로 한눈에 확인하세요.</p>
+    </header>
+
+    <!-- 컨트롤 패널 (시도 선택 드롭다운) -->
+    <section class="control-panel">
+      <!-- 드롭다운 라벨 -->
+      <label for="sidoSelect">지역 선택:</label>
+      <!-- 시도 목록 선택 셀렉트박스 -->
+      <select id="sidoSelect">
+        <!-- 전국 및 17개 광역시도 옵션 -->
+        <option value="전국">전국</option>
+        <option value="서울" selected>서울</option>
+        <option value="부산">부산</option>
+        <option value="대구">대구</option>
+        <option value="인천">인천</option>
+        <option value="광주">광주</option>
+        <option value="대전">대전</option>
+        <option value="울산">울산</option>
+        <option value="세종">세종</option>
+        <option value="경기">경기</option>
+        <option value="강원">강원</option>
+        <option value="충북">충북</option>
+        <option value="충남">충남</option>
+        <option value="전북">전북</option>
+        <option value="전남">전남</option>
+        <option value="경북">경북</option>
+        <option value="경남">경남</option>
+        <option value="제주">제주</option>
+      </select>
+    </section>
+
+    <!-- [신호등 대시보드] 상단 대표 공기 상태 카드 -->
+    <section class="traffic-light-card" id="trafficLightCard">
+      <!-- 지역명 및 기준 시각 표시 -->
+      <div class="traffic-top-info">
+        <span class="region-badge" id="selectedRegionName">서울</span>
+        <span class="standard-time" id="standardTime">불러오는 중...</span>
+      </div>
+
+      <!-- 메인 신호등 표시 영역: 이모지 + 상태명 + 평균 수치 -->
+      <div class="traffic-main">
+        <!-- 신호등 이모지 (🔵🟢🟠🔴) -->
+        <div class="traffic-emoji" id="trafficEmoji">⏳</div>
+        <!-- 상태명 텍스트 (좋음/보통/나쁨/매우나쁨) -->
+        <div class="traffic-status-text" id="trafficStatusText">불러오는 중...</div>
+        <!-- 평균 미세먼지 수치 -->
+        <div class="traffic-value-box">
+          <span class="label">평균 미세먼지</span>
+          <span class="value" id="averageValue">-</span>
+          <span class="unit">㎍/㎥</span>
+        </div>
+      </div>
+
+      <!-- 한 줄 행동 가이드 안내 문구 (나쁨 이상 시 마스크 권고) -->
+      <div class="traffic-guide-banner" id="trafficGuideBanner">
+        공기 데이터를 불러오는 중입니다...
+      </div>
+    </section>
+
+    <!-- [가로 막대그래프 섹션] 미세먼지 수치 높은 상위 10개 측정소 -->
+    <section class="chart-section" id="chartSection">
+      <!-- 차트 헤더 타이틀 -->
+      <div class="chart-header">
+        <h2>미세먼지 수치 높은 측정소 TOP 10</h2>
+        <span class="chart-subtitle">현재 지역에서 수치가 가장 높은 상위 10개 지점 (단위: ㎍/㎥)</span>
+      </div>
+      <!-- 차트 캔버스 컨테이너 -->
+      <div class="chart-wrapper">
+        <canvas id="dustBarChart"></canvas>
+      </div>
+    </section>
+
+    <!-- 대기질 등급 안내 범례 바 -->
+    <section class="grade-legend">
+      <div class="legend-item"><span class="color-dot dot-blue"></span>🔵 좋음 (0~30)</div>
+      <div class="legend-item"><span class="color-dot dot-green"></span>🟢 보통 (31~80)</div>
+      <div class="legend-item"><span class="color-dot dot-orange"></span>🟠 나쁨 (81~150)</div>
+      <div class="legend-item"><span class="color-dot dot-red"></span>🔴 매우나쁨 (151~)</div>
+      <div class="legend-item"><span class="color-dot dot-gray"></span>⚪ 측정불가</div>
+    </section>
+
+    <!-- 측정소 카드 목록 컨테이너 -->
+    <main class="station-grid" id="stationGrid">
+      <!-- 자바스크립트로 카드가 동적 생성됩니다 -->
+    </main>
+
+    <!-- [자료 출처 푸터] 에어코리아 링크 연결 -->
+    <footer class="app-footer">
+      <p>자료 출처: <a href="https://www.airkorea.or.kr" target="_blank" rel="noopener noreferrer">한국환경공단 에어코리아 대기오염정보</a></p>
+    </footer>
+  </div>
+
+  <!-- 외부 자바스크립트 파일 연결 -->
+  <script src="script.js"></script>
+</body>
+</html>

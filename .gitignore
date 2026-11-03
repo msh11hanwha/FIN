@@ -1,0 +1,15 @@
+# 환경 변수 파일 (인증키 등 민감정보 깃허브 업로드 방지)
+.env
+.env.local
+.env.*.local
+
+# Vercel 로컬 설정 및 빌드 캐시
+.vercel
+
+# Node.js 패키지 의존성 폴더
+node_modules/
+
+# 운영체제 생성 임시 파일
+.DS_Store
+Thumbs.db
+
